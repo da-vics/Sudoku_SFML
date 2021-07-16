@@ -1,2 +1,2 @@
 # Sudoku_SFML
-Sudoku game made with C++ and SFML 2.5.1 
+Sudoku game made with C++ and SFML 2.5.1 (Static Puzzle for now...)

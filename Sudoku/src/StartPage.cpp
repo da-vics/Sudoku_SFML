@@ -117,7 +117,7 @@ void StartPage::MouseMoveTigger() {
 
 		this->_PlayGameButton.setFillColor(sf::Color::White);
 		this->_playGameText.setFillColor(CaramelColor);
-	}                                                                       //PlayGame Btn
+	}                                                                       //PlayGame Btn	
 	else {
 		this->_PlayGameButton.setFillColor(CaramelColor);
 		this->_playGameText.setFillColor(sf::Color::White);

@@ -156,42 +156,6 @@ void GamePlayPage::setUp() {
 
 #pragma endregion
 
-
-#pragma region Option Selector
-
-	if (this->computerPlay == false)
-	{
-		gridPosX = boardOriginX;
-		gridPosY += 20;
-		int fillval = 1;
-
-		for (int i = 0; i < SudokuMapGen::MaxSize; ++i) {
-
-			this->_optionField[i].setFillColor(sf::Color(223, 229, 237));
-			this->_optionField[i].setOutlineColor(sf::Color(sf::Color(92, 95, 99)));
-			this->_optionField[i].setOutlineThickness(1.f);
-			this->_optionField[i].setSize(sf::Vector2f(55.55f, 50.f));
-			this->_optionField[i].setPosition(sf::Vector2f(gridPosX, gridPosY));
-
-			this->_optionText[i].setFont(this->_HeaderFont);
-			this->_optionText[i].setCharacterSize(30);
-			this->_optionText[i].setFillColor(sf::Color(55, 57, 59));
-			this->_optionText[i].setString(std::to_string(fillval));
-
-			auto sizex = this->_optionText[i].getLocalBounds().width / 0.8f;
-			auto sizey = this->_optionText[i].getLocalBounds().height / 2.f;
-
-			this->_optionText[i].setPosition(sf::Vector2f(gridPosX + sizex, gridPosY + sizey));
-
-			gridPosX += 55.55f;
-			++fillval;
-		}
-
-		this->_optionField[this->_selectedIndex].setFillColor(sf::Color(193, 154, 107));
-	}//
-
-#pragma endregion
-
 }
 
 void GamePlayPage::Display() {
@@ -202,11 +166,6 @@ void GamePlayPage::Display() {
 	this->_window->draw(this->_gameBoard);
 
 	for (int i = 0; i < SudokuMapGen::MaxSize;++i) {
-
-		if (this->computerPlay == false) {
-			this->_window->draw(this->_optionField[i]);    //Option Selector
-			this->_window->draw(this->_optionText[i]);
-		}
 
 		for (int j = 0; j < SudokuMapGen::MaxSize;++j) {
 
@@ -241,20 +200,18 @@ void GamePlayPage::MouseMoveTigger() {
 
 	for (int i = 0; i < SudokuMapGen::MaxSize; ++i) {
 
-		if (this->IsMouseOverButton(this->_optionField[i]))
-			this->_optionField[i].setFillColor(sf::Color(193, 154, 107));
-		else
-		{
-			if (i != this->_selectedIndex)
-				this->_optionField[i].setFillColor(sf::Color(223, 229, 237));
-		}
-
 		for (int j = 0; j < SudokuMapGen::MaxSize; ++j) {
 
 			if (this->IsMouseOverButton(this->_gameGridMap[i][j]))
-				this->_gameGridMap[i][j].setFillColor(sf::Color(193, 154, 107));
+				this->_gameGridMap[i][j].setFillColor(LineColor);
 			else
+			{
+				if (this->_selectedPos.col == j && this->_selectedPos.row == i)
+					continue;
+
 				this->_gameGridMap[i][j].setFillColor(sf::Color(223, 229, 237));
+			}
+
 		}
 	}
 
@@ -281,25 +238,29 @@ void GamePlayPage::OnFocusEvent() {
 
 	for (int i = 0; i < SudokuMapGen::MaxSize; ++i) {
 
-		if (this->IsMouseOverButton(this->_optionField[i])) {
-
-			this->_optionField[this->_selectedIndex].setFillColor(sf::Color(223, 229, 237)); //reset element Previously highlighted.. 
-			this->_selectedIndex = i;
-			this->_optionField[i].setFillColor(sf::Color(193, 154, 107));
-			this->_selectedNumber = this->_selectedIndex + 1;
-		}
-
 		for (int j = 0; j < SudokuMapGen::MaxSize; ++j) {
 
 			if (this->IsMouseOverButton(this->_gameGridMap[i][j])) {
 
 				if (this->_sudokuMap.gameMap[i][j] == 0)
 				{
-					this->_textGridMap[i][j].setString(std::to_string(this->_selectedNumber));
-					this->_sudokuMap.gameMap[i][j] = this->_selectedNumber;
-					this->_selections.push_back({ i,j });
+					if (this->_selectedPos.row != -1)
+					{
+						this->_gameGridMap[this->_selectedPos.row][this->_selectedPos.col].setFillColor(sf::Color(223, 229, 237));
+						if (_textSet != true) {
+							this->_sudokuMap.gameMap[this->_selectedPos.row][this->_selectedPos.col] = 0;
+							this->_textGridMap[this->_selectedPos.row][this->_selectedPos.col].setString(" ");
+						}
+					}
+
+
+					this->_gameGridMap[i][j].setFillColor(LineColor);
+					this->_selectedPos.row = i;
+					this->_selectedPos.col = j;
+					this->_textSet = false;
 				}
 			}
+
 		}
 	}
 
@@ -382,6 +343,25 @@ void GamePlayPage::OnFocusEvent() {
 
 }
 
+void GamePlayPage::MapInput(sf::Event* event) {
+
+	if (event->type == sf::Event::TextEntered && this->_selectedPos.row != -1) {
+
+		int charTyped = event->text.unicode;
+
+		auto ch = (char)charTyped;
+
+		if (charTyped >= 49 && charTyped <= 57)   // if input is between 1-9
+		{
+			std::string temp;
+			temp.push_back(char(charTyped));
+			this->_selectedNumber = std::stoi(temp);
+			this->_textGridMap[this->_selectedPos.row][this->_selectedPos.col].setString(std::to_string(this->_selectedNumber));
+			this->_sudokuMap.gameMap[this->_selectedPos.row][this->_selectedPos.col] = this->_selectedNumber;
+		}
+	}
+}
+
 void GamePlayPage::HandleEvents(sf::Event* event) {
 
 	if (this->computerPlay == false) {
@@ -391,6 +371,9 @@ void GamePlayPage::HandleEvents(sf::Event* event) {
 
 		if (event->type == sf::Event::MouseMoved)
 			this->MouseMoveTigger();
+
+		this->MapInput(event);
+
 	}
 
 	else
@@ -405,13 +388,44 @@ void GamePlayPage::HandleEvents(sf::Event* event) {
 		}
 	}
 
-	if (event->type == sf::Event::KeyPressed) {
-
+	if (event->type == sf::Event::KeyPressed)
+	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) // Go back to startPage
 		{
-			this->_window->clear(sf::Color::Black);
-			this->ChangePage = true;
-			this->NavTOPage = GamePages::StartPage;
+			if (this->computerPlay == true) {
+				this->ChangePage = true;
+				this->NavTOPage = GamePages::StartPage;
+			}
+			else if (this->_selectedPos.row == -1) {
+				this->ChangePage = true;
+				this->NavTOPage = GamePages::StartPage;
+			}
+		}
+
+		if (this->computerPlay == false && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {  // deselect box
+
+			if (this->_selectedPos.row != -1)
+			{
+				this->_gameGridMap[this->_selectedPos.row][this->_selectedPos.col].setFillColor(sf::Color(223, 229, 237));
+				this->_sudokuMap.gameMap[this->_selectedPos.row][this->_selectedPos.col] = 0;
+				this->_textGridMap[this->_selectedPos.row][this->_selectedPos.col].setString(" ");
+				this->_selectedPos.row = -1;
+				this->_selectedPos.col = -1;
+			}
+		}
+
+
+		if (this->computerPlay == false && sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {  // SaveChanges box
+
+			if (this->_selectedPos.row != -1)
+			{
+				this->_textSet = true;
+				this->_selections.push_back({ this->_selectedPos.row,this->_selectedPos.col });
+				this->_gameGridMap[this->_selectedPos.row][this->_selectedPos.col].setFillColor(sf::Color(223, 229, 237));
+				this->_selectedPos.row = -1;
+				this->_selectedPos.col = -1;
+			}
+
 		}
 	}
 

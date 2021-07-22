@@ -14,7 +14,6 @@ public:
 		this->NavTOPage = GamePages::None;
 		this->computerPlay = compPlay;
 		this->setUp();
-
 	}
 
 	bool computerPlay; // if true "AI" is playing
@@ -27,6 +26,16 @@ private:
 	void HoverCheck(sf::RectangleShape*, sf::Text*);
 	void OnFocusEvent();
 	bool AISolve(int grid[SudokuMapGen::MaxSize][SudokuMapGen::MaxSize]);
+	void MapInput(sf::Event*);
+
+	bool _textSet{ false };
+	bool _checkErr{ false };
+	bool _resetErrColor{ false };
+	bool _aiDone{ false };
+	bool _initAi{ false };
+	Field _selectedPos{ -1,-1 };
+	int _selectedNumber{ -1 }; //default
+
 	SudokuMapGen _sudokuMap;
 	sf::RectangleShape _gameBoard;
 	sf::Font _HeaderFont;
@@ -38,10 +47,6 @@ private:
 	sf::RectangleShape _hLine2;
 	sf::RectangleShape _gameGridMap[SudokuMapGen::MaxSize][SudokuMapGen::MaxSize];
 	sf::Text _textGridMap[SudokuMapGen::MaxSize][SudokuMapGen::MaxSize];
-	sf::Text _optionText[SudokuMapGen::MaxSize];
-	sf::RectangleShape _optionField[SudokuMapGen::MaxSize];
-	int _selectedNumber{ 1 }; //default
-	int _selectedIndex{ 0 }; //default
 	std::vector<Field> _selections;
 	sf::RectangleShape _submitButton;
 	sf::RectangleShape _undoButton;
@@ -50,9 +55,6 @@ private:
 	sf::Text _undoText;
 	sf::Text _checkText;
 	const sf::Color LineColor = sf::Color(193, 154, 107);
-	bool _checkErr{ false };
-	bool _resetErrColor{ false };
-	bool _aiDone{ false };
-	bool _initAi{ false };
+
 };
 

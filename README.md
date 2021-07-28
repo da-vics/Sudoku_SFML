@@ -3,5 +3,5 @@ Sudoku game made with C++ and SFML 2.5.1 (Static Puzzle for now...) check out GU
 
 <h3>Game Menu</h3>
 <div align="middle">
-<img src="Sudoku_SFML/Sudoku/ProjectImages/image1.png" width=50%> </img>
+<img src="Sudoku/ProjectImages/image1.png" width=50%> </img>
 </div>

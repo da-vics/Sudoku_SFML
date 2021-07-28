@@ -10,3 +10,13 @@ Sudoku game made with C++ and SFML 2.5.1 (Static Puzzle for now...) check out GU
 <div align="middle">
 <img src="Sudoku/ProjectImages/image2.png" width=50%> </img>
 </div>
+
+<h3>Game Over</h3>
+<div align="middle">
+<img src="Sudoku/ProjectImages/image4.png" width=50%> </img>
+</div>
+
+<h3>Computer Solve Puzzle</h3>
+<div align="middle">
+<img src="Sudoku/ProjectImages/image6.png" width=50%> </img>
+</div>
